@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const DepositoDGM = require("../models/DepositosDGM");
 const CargaDGM = require("../models/CargasDGM");
 const DepositoCMDM = require("../models/DepositosCMDM");
@@ -114,13 +115,64 @@ exports.getDashboard = async (req, res) => {
       .sort({ fechaCarga: -1 });
 
     // Calcular la suma total de los importes
-    const totalImporte = CargaDGM.reduce((sum, carga) => sum + carga.importeCarga, 0);
+    const totalImporte = cargas.reduce((sum, carga) => sum + carga.importeCarga, 0);
     // Calcular el saldo restante
     const saldoRestante = ultimoDeposito.cantidadDeposito - totalImporte;
     res.render("dashboard", { user: req.user, depositos, cargas, mensaje: null, totalImporte, saldoRestante , totalDepositos: totalDepositos.length > 0 ? totalDepositos[0].total : 0,totalConsumido: totalConsumido.length > 0 ? totalConsumido[0].total : 0});
     //res.render("lista-cargas", { cargas, mensaje: null });
   } catch (error) {
+    console.log(error)
     res.status(500).send("Error al obtener las cargas");
   }
 
 };
+// aqui comienza nuevo modelo
+
+// Definir modelos
+const Cliente = mongoose.model('Cliente', new mongoose.Schema({
+  nombre: String,
+  rfc: String
+}));
+
+const Deposito = mongoose.model('Deposito', new mongoose.Schema({
+  fecha: Date,
+  importe: Number,
+  cliente: { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente' }
+}));
+
+const Carga = mongoose.model('Carga', new mongoose.Schema({
+  fechaCarga: Date,
+  importeCarga: Number,
+  productoCarga: String,
+  deposito: { type: mongoose.Schema.Types.ObjectId, ref: 'Deposito' }
+}));
+
+exports.getPanel = async (req, res) => {
+  const clientes = await Cliente.find();
+  const depositos = await Deposito.find().populate('cliente');
+  
+  res.render('dashboard', { clientes,depositos });
+}
+exports.postCliente = async (req, res) => {
+  await Cliente.create({ nombre: req.body.nombre, rfc: req.body.rfc });
+    res.redirect('/dashboard');
+}
+exports.postDeposito = async (req, res) => {
+  await Deposito.create({ fecha: req.body.fecha, importe: req.body.importe, cliente: req.body.cliente });
+  res.redirect('/dashboard');
+}
+
+exports.postCarga = async (req, res) => {
+  await Carga.create({ fechaCarga: req.body.fechaCarga, importeCarga: req.body.importeCarga, deposito: req.body.deposito });
+  res.redirect('/dashboard');
+}
+
+exports.getCargas = async (req, res) => {
+  const clienteId = req.params.clienteId;
+  const ultimoDeposito = await Deposito.findOne({ cliente: clienteId }).sort({ fecha: -1 });
+  let cargas = [];
+  if (ultimoDeposito) {
+      cargas = await Carga.find({ deposito: ultimoDeposito._id });
+  }
+  res.json(cargas);
+}

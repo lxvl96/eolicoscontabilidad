@@ -79,22 +79,6 @@ The above copyright notice and this permission notice shall be included in all c
             f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-NKDMSK6');
     </script>
-
-    <script>
-        async function filtrarCargas() {
-            const clienteId = document.getElementById("clienteSelect").value;
-            const response = await fetch(`/cargas/${clienteId}`);
-            const cargas = await response.json();
-            const tbody = document.getElementById("cargasTableBody");
-            tbody.innerHTML = "";
-            cargas.forEach(carga => {
-                tbody.innerHTML += `<tr>
-                <td>${new Date(carga.fechaCarga).toLocaleDateString()}</td>
-                <td>${carga.importeCarga}</td>
-            </tr>`;
-            });
-        }
-    </script>
     <!-- End Google Tag Manager -->
 </head>
 
@@ -155,27 +139,27 @@ The above copyright notice and this permission notice shall be included in all c
                     <li class="nav-item active ">
                         <a class="nav-link" href="../examples/dashboard.html">
                             <i class="material-icons">dashboard</i>
-                            <p> Panel de Consumos.</p>
+                            <p> Diamond Generation Corp.</p>
                         </a>
                     </li>
-                    <!-- <li class="nav-item ">
+                    <li class="nav-item ">
                         <a class="nav-link" href="../examples/widgets.html">
                             <i class="material-icons">widgets</i>
                             <p> Next Energy Mexicana</p>
                         </a>
-                    </li> -->
-                    <!-- <li class="nav-item ">
+                    </li>
+                    <li class="nav-item ">
                         <a class="nav-link" href="../examples/widgets.html">
                             <i class="material-icons">widgets</i>
                             <p> Nereida Sanchez Castillo </p>
                         </a>
-                    </li> -->
-                    <!-- <li class="nav-item ">
+                    </li>
+                    <li class="nav-item ">
                         <a class="nav-link" href="../examples/widgets.html">
                             <i class="material-icons">widgets</i>
                             <p> Carlos Manuel Diego Mtz </p>
                         </a>
-                    </li> -->
+                    </li>
                     <!-- <li class="nav-item ">
                         <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
                             <i class="material-icons">image</i>
@@ -373,7 +357,7 @@ The above copyright notice and this permission notice shall be included in all c
                                             <i class="material-icons">local_atm</i>
                                         </div>
                                         <p class="card-category">Total Despositado</p>
-                                        <h3 class="card-title"><strong>$</strong></h3>
+                                        <h3 class="card-title"><strong>$<%= totalDepositos.toFixed(2) %></strong></h3>
                                     </div>
                                     <div class="card-footer">
                                         <div class="stats">
@@ -390,11 +374,11 @@ The above copyright notice and this permission notice shall be included in all c
                                             <i class="material-icons">local_atm</i>
                                         </div>
                                         <p class="card-category">Deposito Actual</p>
-                                        <h3 class="card-title"></h3>
+                                        <h3 class="card-title">$15000</h3>
                                     </div>
                                     <div class="card-footer">
                                         <div class="stats">
-                                            <i class="material-icons">local_offer</i> Fecha Actual:
+                                            <i class="material-icons">local_offer</i> Fecha Actual: 13/02/2025
                                         </div>
                                     </div>
                                 </div>
@@ -406,7 +390,7 @@ The above copyright notice and this permission notice shall be included in all c
                                             <i class="material-icons">local_atm</i>
                                         </div>
                                         <p class="card-category">Total Consumido</p>
-                                        <h3 class="card-title"><strong>$</strong></h3>
+                                        <h3 class="card-title"><strong>$<%= totalConsumido.toFixed(2) %></strong></h3>
                                     </div>
                                     <div class="card-footer">
                                         <div class="stats">
@@ -423,7 +407,7 @@ The above copyright notice and this permission notice shall be included in all c
                                             <i class="material-icons">local_atm</i>
                                         </div>
                                         <p class="card-category">Saldo Restante</p>
-                                        <h3 class="card-title">$</h3>
+                                        <h3 class="card-title">$<%= saldoRestante.toFixed(2) %></h3>
                                     </div>
                                     <div class="card-footer">
                                         <div class="stats">
@@ -442,36 +426,71 @@ The above copyright notice and this permission notice shall be included in all c
                                 <div class="card">
 
                                     <div class="card-header card-header-primary">
-                                        <h4 class="card-title"> <i class="material-icons">date_range</i>Cliente: 
-                                            <select id="clienteSelect" onchange="filtrarCargas()">
-                                            <option value="">-- Seleccionar --</option>
-                                            <% clientes.forEach(cliente => { %>
-                                                <option value="<%= cliente._id %>"><%= cliente.nombre %></option>
-                                            <% }) %>
-                                        </select></h4>
+                                        <h4 class="card-title"> <i class="material-icons">date_range</i>Fecha del
+                                            Deposito: 12/02/2025</h4>
                                         <p class="card-category"><i class="material-icons">local_atm</i>Cantidad
-                                            Consumida:$ &nbsp; &nbsp; <i class="material-icons">local_atm</i>Saldo
-                                            Restante:
+                                            Consumida:$<%= totalImporte.toFixed(2) %> &nbsp; &nbsp; <i
+                                                    class="material-icons">local_atm</i>Saldo
+                                                Restante: $<%= saldoRestante.toFixed(2) %>
                                         </p>
                                     </div>
 
                                     <div class="card-body table-responsive">
+                                        <% if (mensaje) { %>
+                                            <p>
+                                                <%= mensaje %>
+                                            </p>
+                                            <% } else { %>
+                                                <table class="table table-hover">
+                                                    <thead class="text-primary">
+                                                        <th>Fecha</th>
+                                                        <th>Importe</th>
+                                                        <th>Producto</th>
+                                                        <th>Relacion Deposito</th>
+                                                        <th>Opciones</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% cargas.forEach(carga=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= carga.fechaCarga.toISOString().split('T')[0] %>
+                                                                </td>
+                                                                <td>$<%= carga.importeCarga %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= carga.tipoCombustible %>
+                                                                </td>
+                                                                <td> Fecha: <%=
+                                                                        carga.depositoSeleccionado.fechaDeposito.toISOString().split('T')[0]
+                                                                        %> -
+                                                                        Cantidad: <%=
+                                                                            carga.depositoSeleccionado.cantidadDeposito
+                                                                            %>
+                                                                </td>
+                                                                <td class="td-actions text-right">
+                                                                    <button type="button" rel="tooltip"
+                                                                        title="Editar Carga"
+                                                                        class="btn btn-dark btn-link btn-sm">
+                                                                        <i class="material-icons">edit</i>
+                                                                    </button>
 
-                                        <table class="table table-hover">
-                                            <thead class="text-primary">
-                                                <th>Fecha</th>
-                                                <th>Importe</th>
-                                                <th>Producto</th>
-                                                <th>Relacion Deposito</th>
-                                                <th>Opciones</th>
-                                            </thead>
-                                            <tbody id="cargasTableBody">
-                                                <!-- Aquí se mostrarán las cargas -->
-                                            </tbody>
-                                        </table>
+                                                                    <a href="/eliminar-carga-dgm/<%= carga._id %>"
+                                                                        rel="tooltip" title="Eliminar Carga"
+                                                                        class="btn btn-dark btn-link btn-sm">
+                                                                        <i class="material-icons">close</i>
+                                                                        </button>
+
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+
+
+
+                                                    </tbody>
+                                                </table>
                                     </div>
                                 </div>
-
+                                <% } %>
                             </div>
 
 
@@ -495,12 +514,7 @@ The above copyright notice and this permission notice shall be included in all c
                                                             <div class="ripple-container"></div>
                                                         </a>
                                                     </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="#clients" data-toggle="tab">
-                                                            <i class="material-icons">code</i> Clientes
-                                                            <div class="ripple-container"></div>
-                                                        </a>
-                                                    </li>
+
                                                 </ul>
                                             </div>
                                         </div>
@@ -508,50 +522,50 @@ The above copyright notice and this permission notice shall be included in all c
                                     <div class="card-body">
                                         <div class="tab-content">
                                             <div class="tab-pane active" id="cargas">
-                                                <form action="/nueva-carga" method="POST">
-                                                    <label>Fecha de Carga:</label>
-                                                    <input type="date" name="fechaCarga" required><br>
-                                                    <label>Importe de Carga:</label>
-                                                    <input type="number" name="importeCarga" required><br>
-                                                    <label>Depósito:</label>
-                                                    <select name="deposito" required>
-                                                        <% depositos.forEach(deposito => { %>
+                                                <form action="/guardar-carga-dgm" method="POST">
+                                                    <label for="fechaCarga">Fecha de Carga:</label>
+                                                    <input type="date" name="fechaCarga" required><br><br>
+
+                                                    <label for="importeCarga">Importe de la Carga:</label>
+                                                    <input type="number" name="importeCarga" step="0.01"
+                                                        required><br><br>
+
+                                                    <label for="tipoCombustible">Tipo de Combustible:</label>
+                                                    <select name="tipoCombustible" required
+                                                        class="border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-2 focus:ring-fuchsia-50 focus:border-fuchsia-300 block w-full p-2.5">
+                                                        <option value="Premium">Premium</option>
+                                                        <option value="Magna">Magna</option>
+                                                        <option value="Diésel">Diésel</option>
+                                                    </select><br><br>
+
+                                                    <label for="depositoSeleccionado">Seleccionar Depósito:</label>
+                                                    <select name="depositoSeleccionado" required>
+                                                        <% depositos.forEach(deposito=> { %>
                                                             <option value="<%= deposito._id %>">
-                                                                Depósito de <%= deposito.cliente ? deposito.cliente.nombre : 'Cliente no disponible' %> - 
-                                                                <%= deposito.fecha ? new Date(deposito.fecha).toLocaleDateString() : 'Fecha no disponible' %>
+                                                                Fecha: <%=
+                                                                    deposito.fechaDeposito.toISOString().split('T')[0]
+                                                                    %> -
+                                                                    Cantidad: <%= deposito.cantidadDeposito %>
                                                             </option>
-                                                        <% }) %>
-                                                    </select><br>
-                                                    <button type="submit">Guardar</button>
+                                                            <% }) %>
+                                                    </select><br><br>
+
+                                                    <button type="submit">Guardar Carga</button>
                                                 </form>
                                             </div>
 
                                             <div class="tab-pane" id="depositos">
-                                                <form action="/nuevo-deposito" method="POST">
-                                                    <label>Fecha:</label>
-                                                    <input type="date" name="fecha" required><br>
-                                                    <label>Importe:</label>
-                                                    <input type="number" name="importe" required><br>
-                                                    <label>Cliente:</label>
-                                                    <select name="cliente" required>
-                                                        <% clientes.forEach(cliente=> { %>
-                                                            <option value="<%= cliente._id %>">
-                                                                <%= cliente.nombre %>
-                                                            </option>
-                                                            <% }) %>
-                                                    </select><br>
-                                                    <button type="submit">Guardar</button>
-                                                </form>
-                                            </div>
+                                                <form action="/guardar-deposito-dgm" method="POST">
+                                                    <label for="fechaDeposito">Fecha de Depósito:</label>
+                                                    <input type="date" name="fechaDeposito" required><br><br>
 
-                                            <div class="tab-pane" id="clients">
-                                                <form action="/nuevo-cliente" method="POST">
-                                                    <label>Nombre:</label>
-                                                    <input type="text" name="nombre" required>
-                                                    <br>
-                                                    <label>RFC:</label>
-                                                    <input type="text" name="rfc" required><br>
-                                                    <button type="submit">Guardar</button>
+                                                    <label for="cantidadDeposito">Cantidad del Depósito:</label>
+                                                    <input type="number" name="cantidadDeposito" step="0.01"
+                                                        required><br><br>
+
+                                                    <br><br>
+
+                                                    <button type="submit">Guardar Depósito</button>
                                                 </form>
                                             </div>
 
@@ -864,7 +878,7 @@ The above copyright notice and this permission notice shall be included in all c
         });
     </script>
     <!-- Sharrre libray -->
-    <!--   <script src="https://demos.creative-tim.com/material-dashboard-pro-bs4/assets/demo/jquery.sharrre.js"></script>
+  <!--   <script src="https://demos.creative-tim.com/material-dashboard-pro-bs4/assets/demo/jquery.sharrre.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -992,7 +1006,7 @@ The above copyright notice and this permission notice shall be included in all c
 
         });
     </script> -->
-    <!--  <script defer
+   <!--  <script defer
         src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
         integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
         data-cf-beacon='{"rayId":"9131005cef572ae3","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.1.0","token":"1b7cbb72744b40c580f8633c6b62637e"}'

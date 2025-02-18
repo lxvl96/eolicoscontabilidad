@@ -58,5 +58,5 @@ app.use((req, res, next) => {
 app.use("/", authRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor en puerto http://localhost:${PORT}`));
 

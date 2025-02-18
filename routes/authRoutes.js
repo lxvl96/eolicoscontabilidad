@@ -12,11 +12,11 @@ router.post("/login", authController.postLogin);
 router.get("/register",  isAuthenticated,authController.getRegister);
 router.post("/register", authController.postRegister);
 
-router.get("/dashboard",  authController.getDashboard);
+router.get("/dashboard",  authController.getPanel);
 
 router.get("/logout", authController.logout);
 
-router.post("/guardar-deposito-dgm", async (req, res) => {
+/* router.post("/guardar-deposito-dgm", async (req, res) => {
     try {
       const nuevoDeposito = new DepositosDGM({
         fechaDeposito: req.body.fechaDeposito,
@@ -72,7 +72,13 @@ router.get("/eliminar-carga-dgm/:id", async (req, res) => {
     } catch (error) {
       res.status(500).send("Error al eliminar la carga");
     }
-  });
+  }); */
 
+router.get('/cargas/:clienteId', authController.getCargas);
+
+
+router.post('/nuevo-cliente', authController.postCliente);
+router.post('/nuevo-deposito', authController.postDeposito);
+router.post('/nueva-carga', authController.postCarga);
 module.exports = router;
 
