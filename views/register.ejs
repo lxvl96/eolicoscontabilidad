@@ -1,0 +1,30 @@
+ 
+<%- include('partials/header') %>
+<h2>Registro</h2>
+<!-- Mensajes Flash -->
+<% if (success_msg) { %>
+    <div class="alert alert-success">
+      <%= success_msg %>
+    </div>
+  <% } %>
+  
+  <% if (error_msg) { %>
+    <div class="alert alert-error">
+      <%= error_msg %>
+    </div>
+  <% } %>
+  
+  <% if (error) { %>
+    <div class="alert alert-error">
+      <%= error %>
+    </div>
+  <% } %>
+<form action="/register" method="POST">
+    <input type="text" name="name" placeholder="Nombre" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <input type="password" name="password2" placeholder="Confirmar Contraseña" required>
+    <button type="submit">Registrarse</button>
+</form>
+<a href="/login">Iniciar Sesión</a>
+<%- include('partials/footer') %>

@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+<h2>Iniciar Sesión</h2>
+<!-- Mensajes Flash -->
+<% if (success_msg) { %>
+    <div class="alert alert-success">
+      <%= success_msg %>
+    </div>
+  <% } %>
+  
+  <% if (error_msg) { %>
+    <div class="alert alert-error">
+      <%= error_msg %>
+    </div>
+  <% } %>
+  
+  <% if (error) { %>
+    <div class="alert alert-error">
+      <%= error %>
+    </div>
+  <% } %>
+<form action="/login" method="POST">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <button type="submit">Ingresar</button>
+</form>
+<a href="/register">Registrarse</a>
+<%- include('partials/footer') %>
+ 

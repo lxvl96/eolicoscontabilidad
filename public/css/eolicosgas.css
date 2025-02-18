@@ -1,0 +1,133 @@
+
+/* .wizard-container {
+    box-shadow: 0px 16px 52px -13px rgba(255,0,6,1);
+    box-shadow: 0 16px 24px 2px rgba(0,0,0,.14),0 6px 30px 5px rgba(0,0,0,.12),0 8px 10px -5px rgba(0,0,0,.2);
+} */
+[data-notify] { z-index: 9999 !important; }
+
+.card .card-content .cliente {
+  margin-bottom: 0;
+}
+
+.card .cliente:not([class*="text-"]) {
+  color: #fbbb1d;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.card-cliente {
+  text-align: center;
+  /* background-color: #fff; */
+  /* background-image: linear-gradient(130deg, #fff , #fbbb1d) */
+  background-image: linear-gradient(to right, #fff , #d4d4d4)
+}
+
+.card-cliente .icon {
+  padding: 10px 0 0px;
+  color: #999999;
+}
+
+.card-cliente .icon.icon-red {
+  color: #ff0006;
+
+}
+
+.card-cliente .icon i {
+  font-size: 55px;
+  border: 1px solid #fbbb1d;
+  border-radius: 50%;
+  width: 130px;
+  line-height: 130px;
+  height: 130px;
+}
+
+.card-raised {
+  transition: all .3s ease-in;
+}
+
+.card-raised:hover {
+  margin-top: 15px;
+  box-shadow: 0px 16px 52px -13px rgba(255,0,6,1);
+}
+
+
+@media (min-width: 992px){
+    .typo-line{
+        padding-left: 140px;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .typo-line .category{
+        transform: translateY(-50%);
+        top: 50%;
+        left: 0px;
+        position: absolute;
+    }
+}
+
+#map{
+    position:relative;
+    width:100%;
+    height: calc(100% - 60px);
+    margin-top: 70px;
+}
+
+.places-buttons .btn{
+    margin-bottom: 30px
+}
+
+.space-70{
+    height: 70px;
+    display: block;
+}
+
+.tim-row{
+    margin-bottom: 20px;
+}
+
+.tim-typo{
+    padding-left: 25%;
+    margin-bottom: 40px;
+    position: relative;
+}
+.tim-typo .tim-note{
+    bottom: 10px;
+    color: #c0c1c2;
+    display: block;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 13px;
+    left: 0;
+    margin-left: 20px;
+    position: absolute;
+    width: 260px;
+}
+.tim-row{
+    padding-top: 50px;
+}
+.tim-row h3{
+    margin-top: 0;
+}
+
+.fullscreen-modal .modal-dialog {
+  margin: 0;
+  margin-right: auto;
+  margin-left: auto;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .fullscreen-modal .modal-dialog {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .fullscreen-modal .modal-dialog {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .fullscreen-modal .modal-dialog {
+     width: 1170px;
+  }
+}
