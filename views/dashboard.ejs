@@ -62,6 +62,76 @@ The above copyright notice and this permission notice shall be included in all c
     <link href="css/material-dashboard.min.css" rel="stylesheet" />
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="https://demos.creative-tim.com/material-dashboard-pro-bs4/assets/demo/demo.css" rel="stylesheet" />
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Estilos del formulario */
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: left;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        /* Estilos para inputs y selects */
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #fff;
+        }
+
+        /* Estilos del botón */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .form-row div {
+            flex: 1;
+        }
+    </style>
     <!-- Google Tag Manager -->
     <script>
         (function (w, d, s, l, i) {
@@ -80,7 +150,7 @@ The above copyright notice and this permission notice shall be included in all c
         })(window, document, 'script', 'dataLayer', 'GTM-NKDMSK6');
     </script>
 
-    <script>
+    <!--   <script>
         async function filtrarCargas() {
             const clienteId = document.getElementById("clienteSelect").value;
             const response = await fetch(`/cargas/${clienteId}`);
@@ -91,8 +161,66 @@ The above copyright notice and this permission notice shall be included in all c
                 tbody.innerHTML += `<tr>
                 <td>${new Date(carga.fechaCarga).toLocaleDateString()}</td>
                 <td>${carga.importeCarga}</td>
+                <td>${carga.productoCarga}</td>
+                <td>${carga.deposito.importe}</td>
             </tr>`;
             });
+        }
+    </script> -->
+    <script>
+        async function obtenerDepositos() {
+            const clienteId = document.getElementById("clienteSelect").value;
+            if (!clienteId) {
+                document.getElementById("depositoSelect").innerHTML = '<option value="">Selecciona un depósito</option>';
+                document.getElementById("cargasTableBody").innerHTML = "";
+                return;
+            }
+
+            const response = await fetch(`/depositos/${clienteId}`);
+            const depositos = await response.json();
+
+            let opciones = '<option value="">Selecciona un depósito</option>';
+            depositos.forEach(deposito => {
+                opciones += `<option value="${deposito._id}">${new Date(deposito.fecha).toLocaleDateString()} - $${deposito.importe}</option>`;
+            });
+            document.getElementById("depositoSelect").innerHTML = opciones;
+        }
+
+        async function obtenerCargas() {
+            const depositoId = document.getElementById("depositoSelect").value;
+            if (!depositoId) {
+                document.getElementById("cargasTableBody").innerHTML = "";
+                return;
+            }
+
+            const response = await fetch(`/cargas-deposito/${depositoId}`);
+            const data = await response.json();
+
+            let tbody = "";
+            let totalCargas = 0;
+
+            data.cargas.forEach(carga => {
+                tbody += `<tr>
+                    <td>${new Date(carga.fechaCarga).toLocaleDateString()}</td>
+                    <td>$${carga.importeCarga.toFixed(2)}</td>
+                    <td>${carga.productoCarga}</td> <!-- Mostrar producto -->
+                </tr>`;
+                totalCargas += carga.importeCarga;
+            });
+
+            const saldoRestante = data.importeDeposito - totalCargas;
+
+            tbody += `<tr>
+                <td><strong>Total Cargas:</strong></td>
+                <td><strong>$${totalCargas.toFixed(2)}</strong></td>
+                
+            </tr>`;
+            tbody += `<tr>
+                <td><strong>Saldo Restante:</strong></td>
+                <td><strong>$${saldoRestante.toFixed(2)}</strong></td>
+            </tr>`;
+
+            document.getElementById("cargasTableBody").innerHTML = tbody;
         }
     </script>
     <!-- End Google Tag Manager -->
@@ -353,6 +481,7 @@ The above copyright notice and this permission notice shall be included in all c
                         <span class="navbar-toggler-icon icon-bar"></span>
                         <span class="navbar-toggler-icon icon-bar"></span>
                     </button>
+                    &nbsp;&nbsp;&nbsp;&nbsp; Relacion de Cargas
                     <div class="collapse navbar-collapse justify-content-end">
 
 
@@ -372,9 +501,22 @@ The above copyright notice and this permission notice shall be included in all c
                                         <div class="card-icon">
                                             <i class="material-icons">local_atm</i>
                                         </div>
-                                        <p class="card-category">Total Despositado</p>
-                                        <h3 class="card-title"><strong>$</strong></h3>
+                                        <p class="card-category">CLIENTES</p>
+                                        <!-- <h3 class="card-title"><strong>Agregar Deposito</strong></h3> -->
                                     </div>
+                                    <center>
+                                        <form action="/nuevo-cliente" method="POST">
+                                            <label>Nombre:</label>
+                                            <input type="text" name="nombre" required>
+                                            <br>
+                                            <label>RFC:</label>
+                                            <input type="text" name="rfc" required><br>
+                                            <label>Correo Electronico:</label>
+                                            <input type="text" name="email" required><br>
+                                            <button type="submit">Guardar</button>
+                                        </form>
+                                    </center>
+
                                     <div class="card-footer">
                                         <div class="stats">
 
@@ -389,9 +531,26 @@ The above copyright notice and this permission notice shall be included in all c
                                         <div class="card-icon">
                                             <i class="material-icons">local_atm</i>
                                         </div>
-                                        <p class="card-category">Deposito Actual</p>
+                                        <p class="card-category">DEPOSITOS</p>
                                         <h3 class="card-title"></h3>
                                     </div>
+                                    <center>
+                                        <form action="/nuevo-deposito" method="POST">
+                                            <label>Fecha:</label>
+                                            <input type="date" name="fecha" required><br>
+                                            <label>Importe:</label>
+                                            <input type="number" name="importe" required><br>
+                                            <label>Cliente:</label>
+                                            <select name="cliente" required>
+                                                <% clientes.forEach(cliente=> { %>
+                                                    <option value="<%= cliente._id %>">
+                                                        <%= cliente.nombre %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select><br>
+                                            <button type="submit">Guardar</button>
+                                        </form>
+                                    </center>
                                     <div class="card-footer">
                                         <div class="stats">
                                             <i class="material-icons">local_offer</i> Fecha Actual:
@@ -399,15 +558,58 @@ The above copyright notice and this permission notice shall be included in all c
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="col-lg-3 col-md-9 col-sm-9">
                                 <div class="card card-stats">
                                     <div class="card-header card-header-success card-header-icon">
                                         <div class="card-icon">
                                             <i class="material-icons">local_atm</i>
                                         </div>
-                                        <p class="card-category">Total Consumido</p>
+                                        <p class="card-category">CARGAS</p>
                                         <h3 class="card-title"><strong>$</strong></h3>
                                     </div>
+                                    <center>
+                                        <form action="/nueva-carga" method="POST">
+                                            <!-- <label>Fecha de Carga:</label>
+                                            <input type="date" name="fechaCarga" required>
+                                            <label>Importe de Carga:</label>
+                                            <input type="number" name="importeCarga" required> -->
+                                            <div class="form-row">
+                                                <div>
+                                                    <label for="fechaCarga">Fecha de Carga:</label>
+                                                    <input type="date" name="fechaCarga" required>
+                                                </div>
+                                                <div>
+                                                    <label for="importeCarga">Importe de Carga:</label>
+                                                    <input type="text" id="importeCarga" name="importeCarga" required>
+                                                </div>
+                                            </div>
+                                            <label for="producto">Producto:</label>
+                                            <select name="producto" required>
+                                                <option value="Magna">Magna</option>
+                                                <option value="Premium">Premium</option>
+                                                <option value="Diesel">Diesel</option>
+                                            </select>
+
+
+
+                                            <br>
+
+                                            <label>Depósito:</label>
+                                            <select name="deposito" required>
+                                                <% depositos.forEach(deposito=> { %>
+                                                    <option value="<%= deposito._id %>">
+                                                        Depósito de <%= deposito.cliente ? deposito.cliente.nombre
+                                                            : 'Cliente no disponible' %>
+                                                            -
+                                                            <%= deposito.fecha ? new
+                                                                Date(deposito.fecha).toLocaleDateString()
+                                                                : 'Fecha no disponible' %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select><br>
+                                            <button type="submit">Guardar</button>
+                                        </form>
+                                    </center>
                                     <div class="card-footer">
                                         <div class="stats">
                                             <i class="material-icons">date_range</i> Consumo Total de Depositos
@@ -415,11 +617,11 @@ The above copyright notice and this permission notice shall be included in all c
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-6">
+                            <!-- <div class="col-lg-3 col-md-6 col-sm-6">
                                 <div class="card card-stats">
                                     <div class="card-header card-header-warning card-header-icon">
                                         <div class="card-icon">
-                                            <!--  <i class="fa fa-twitter"></i> -->
+
                                             <i class="material-icons">local_atm</i>
                                         </div>
                                         <p class="card-category">Saldo Restante</p>
@@ -431,28 +633,36 @@ The above copyright notice and this permission notice shall be included in all c
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
-                        <h3>Relacion de Cargas</h3>
+                        <!--  <h3>Relacion de Cargas</h3> -->
                         <br>
                         <!-- tablas -->
 
                         <div class="row">
-                            <div class="col-lg-6 col-md-12">
+                            <div class="col-lg-12 col-md-24">
                                 <div class="card">
 
                                     <div class="card-header card-header-primary">
-                                        <h4 class="card-title"> <i class="material-icons">date_range</i>Cliente: 
-                                            <select id="clienteSelect" onchange="filtrarCargas()">
-                                            <option value="">-- Seleccionar --</option>
-                                            <% clientes.forEach(cliente => { %>
-                                                <option value="<%= cliente._id %>"><%= cliente.nombre %></option>
-                                            <% }) %>
-                                        </select></h4>
-                                        <p class="card-category"><i class="material-icons">local_atm</i>Cantidad
+                                        <h4 class="card-title"> <i class="material-icons">date_range</i>Cliente:
+                                            <select id="clienteSelect" onchange="obtenerDepositos()">
+                                                <option value="">-- Seleccionar --</option>
+                                                <% clientes.forEach(cliente=> { %>
+                                                    <option value="<%= cliente._id %>">
+                                                        <%= cliente.nombre %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <!-- <label for="depositoSelect">Selecciona un Depósito:</label> -->
+                                            <select id="depositoSelect" onchange="obtenerCargas()">
+                                                <option value="">-- Seleccionar --</option>
+                                            </select>
+
+                                        </h4>
+                                        <!-- <p class="card-category"><i class="material-icons">local_atm</i>Cantidad
                                             Consumida:$ &nbsp; &nbsp; <i class="material-icons">local_atm</i>Saldo
                                             Restante:
-                                        </p>
+                                        </p> -->
                                     </div>
 
                                     <div class="card-body table-responsive">
@@ -476,7 +686,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 
                             <!-- agregar form -->
-                            <div class="col-lg-6 col-md-12">
+                            <!--  <div class="col-lg-6 col-md-12">
                                 <div class="card">
                                     <div class="card-header card-header-tabs card-header-success">
                                         <div class="nav-tabs-navigation">
@@ -513,14 +723,24 @@ The above copyright notice and this permission notice shall be included in all c
                                                     <input type="date" name="fechaCarga" required><br>
                                                     <label>Importe de Carga:</label>
                                                     <input type="number" name="importeCarga" required><br>
+                                                    <label for="producto">Producto:</label>
+                                                    <select name="producto" required>
+                                                        <option value="Magna">Magna</option>
+                                                        <option value="Premium">Premium</option>
+                                                        <option value="Diesel">Diesel</option>
+                                                    </select><br>
                                                     <label>Depósito:</label>
                                                     <select name="deposito" required>
-                                                        <% depositos.forEach(deposito => { %>
+                                                        <% depositos.forEach(deposito=> { %>
                                                             <option value="<%= deposito._id %>">
-                                                                Depósito de <%= deposito.cliente ? deposito.cliente.nombre : 'Cliente no disponible' %> - 
-                                                                <%= deposito.fecha ? new Date(deposito.fecha).toLocaleDateString() : 'Fecha no disponible' %>
+                                                                Depósito de <%= deposito.cliente ?
+                                                                    deposito.cliente.nombre : 'Cliente no disponible' %>
+                                                                    -
+                                                                    <%= deposito.fecha ? new
+                                                                        Date(deposito.fecha).toLocaleDateString()
+                                                                        : 'Fecha no disponible' %>
                                                             </option>
-                                                        <% }) %>
+                                                            <% }) %>
                                                     </select><br>
                                                     <button type="submit">Guardar</button>
                                                 </form>
@@ -560,16 +780,16 @@ The above copyright notice and this permission notice shall be included in all c
                                 </div>
                             </div>
                         </div>
+                    </div> -->
+                            <!-- fin form -->
+
+
+                        </div>
+                        <!-- fin tables -->
                     </div>
-                    <!-- fin form -->
-
-
                 </div>
-                <!-- fin tables -->
             </div>
-        </div>
-    </div>
-    <!-- <footer class="footer">
+            <!-- <footer class="footer">
                 <div class="container-fluid">
                     <nav class="float-left">
                         <ul>
@@ -604,7 +824,7 @@ The above copyright notice and this permission notice shall be included in all c
                     </div>
                 </div>
             </footer> -->
-    </div>
+        </div>
     </div>
 
     <!--   Core JS Files   -->

@@ -163,16 +163,33 @@ exports.postDeposito = async (req, res) => {
 }
 
 exports.postCarga = async (req, res) => {
-  await Carga.create({ fechaCarga: req.body.fechaCarga, importeCarga: req.body.importeCarga, deposito: req.body.deposito });
+  await Carga.create({ fechaCarga: req.body.fechaCarga, importeCarga: req.body.importeCarga, productoCarga: req.body.producto, deposito: req.body.deposito });
   res.redirect('/dashboard');
 }
 
 exports.getCargas = async (req, res) => {
-  const clienteId = req.params.clienteId;
+   const clienteId = req.params.clienteId;
   const ultimoDeposito = await Deposito.findOne({ cliente: clienteId }).sort({ fecha: -1 });
   let cargas = [];
   if (ultimoDeposito) {
       cargas = await Carga.find({ deposito: ultimoDeposito._id });
   }
-  res.json(cargas);
+  res.json(cargas); 
+
 }
+
+exports.getDepositos = async(req,res) =>{
+  const clienteId = req.params.clienteId;
+    const depositos = await Deposito.find({ cliente: clienteId }).sort({ fecha: -1 });
+    res.json(depositos);
+}
+
+exports.getCargasDepositos = async(req,res) =>{
+  const depositoId = req.params.depositoId;
+  const deposito = await Deposito.findById(depositoId);
+  if (!deposito) return res.json({ cargas: [], importeDeposito: 0 });
+
+  const cargas = await Carga.find({ deposito: depositoId });
+  res.json({ cargas, importeDeposito: deposito.importe });
+}
+

@@ -4,6 +4,7 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const DepositosDGM = require("../models/DepositosDGM"); 
 const CargaDGM = require("../models/CargasDGM");
+const authMiddleware = require("../middleware/authMiddleware");
 
 router.get("/", isAuthenticated, authController.getLogin);
 router.get("/consulta", authController.getLoginEmpresa);
@@ -75,8 +76,8 @@ router.get("/eliminar-carga-dgm/:id", async (req, res) => {
   }); */
 
 router.get('/cargas/:clienteId', authController.getCargas);
-
-
+router.get('/depositos/:clienteId', authController.getDepositos);
+router.get('/cargas-deposito/:depositoId',authController.getCargasDepositos);
 router.post('/nuevo-cliente', authController.postCliente);
 router.post('/nuevo-deposito', authController.postDeposito);
 router.post('/nueva-carga', authController.postCarga);
